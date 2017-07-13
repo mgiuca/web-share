@@ -271,6 +271,12 @@
             USVString title;
             USVString text;
             USVString url;
+            (ImageBitmapSource or ShareImageData) image;
+          };
+
+          dictionary ShareImageData {
+            required ImageBitmapSource source;
+            DOMString type;
           };
         </pre>
         <p>
@@ -297,7 +303,37 @@
           <dd>
             A URL string referring to a resource being shared.
           </dd>
+          <dt>
+            <dfn>image</dfn> member
+          </dt>
+          <dd>
+            An image file or source of pixel data, or a dictionary containing
+            that as well as an explicit media type.
+          </dd>
         </dl>
+        <div data-dfn-for="ShareImageData">
+          <p>
+            The <dfn>ShareImageData</dfn> dictionary allows a media type to be
+            associated with an image:
+          </p>
+          <dl>
+            <dt>
+              <dfn>source</dfn> member
+            </dt>
+            <dd>
+              An image file or source of pixel data.
+            </dd>
+            <dt>
+              <dfn>type</dfn> member
+            </dt>
+            <dd>
+              The <a data-cite="!rfc2046">MIME type</a> to convert the pixel
+              data to. Not valid if <a for=
+              "ShareImageData"><code>source</code></a> is a <a data-cite=
+              "!FileAPI#dfn-blob">Blob</a> (which already has a type).
+            </dd>
+          </dl>
+        </div>
         <div class="note">
           These members are <a data-cite=
           "!WEBIDL#idl-USVString"><code>USVString</code></a> (as opposed to
@@ -315,6 +351,50 @@
           "!HTML#attr-hyperlink-href"><code>href</code></a> on an <a data-cite=
           "!HTML#the-a-element"><code>a</code></a> element, before being given
           to the share target.
+        </div>
+        <div class="note">
+          As an <a data-cite="!HTML#imagebitmapsource">ImageBitmapSource</a>,
+          the <a for="ShareData">image</a> (or <a for="ShareImageData" data-lt=
+          "source"><code>image.source</code></a>) attribute can be supplied as
+          many different types of object. A non-complete list of objects that
+          can be passed here is:
+          <ul>
+            <li>
+              <a data-cite="!HTML#htmlimageelement">HTMLImageElement</a>, an
+              <a data-cite="!HTML#the-img-element"><code>&lt;img&gt;</code></a>
+              element object. This won't work if the image source is on a
+              different origin with cross-origin restrictions.
+            </li>
+            <li>
+              <a data-cite="!HTML#htmlvideoelement">HTMLVideoElement</a>, a
+              <a data-cite=
+              "!HTML#the-video-element"><code>&lt;video&gt;</code></a> element
+              object. This shares the current frame of the video, <em>not</em>
+              the video itself. This won't work if the video source is on a
+              different origin with cross-origin restrictions.
+            </li>
+            <li>
+              <a data-cite="!HTML#htmlcanvaselement">HTMLCanvasElement</a>, a
+              <a data-cite=
+              "!HTML#the-canvas-element"><code>&lt;canvas&gt;</code></a>
+              element object. This won't work if the canvas is not
+              <a data-cite="!HTML#concept-canvas-origin-clean">origin-clean</a>.
+            </li>
+            <li>
+              <a data-cite="!HTML#imagedata">ImageData</a>, containing raw
+              pixel data.
+            </li>
+            <li>
+              <a data-cite="!FileAPI#dfn-Blob"><code>Blob</code></a>,
+              containing an already-encoded image file. As <code>Blob</code>
+              already has a media type, this may not be used in conjunction
+              with the <a for="ShareImageData" data-lt=
+              "source"><code>image.type</code></a> attribute. This is the most
+              direct option as the user agent might directly transfer the bytes
+              without re-encoding the image (or if it does, it will use the
+              same file format).
+            </li>
+          </ul>
         </div>
       </section>
     </section>
