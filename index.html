@@ -102,25 +102,6 @@
         file.
       </p>
     </section>
-    <h2>
-      Rough notes on image sharing
-    </h2>
-    <ul>
-      <li>Define our own dict format with an optional mimeType member. Can
-      either specify this dict, or just a raw image.
-      </li>
-      <li>If it's a blob: if mimeType is explicitly specified, check that it
-      matches blob.type.
-      </li>
-      <li>If it's a HTMLCanvasElement: call toBlob() with the given mimeType,
-      or 'image/png' by default.
-      </li>
-      <li>If it's a different type of ImageBitmapSource: create a canvas, copy
-      it into the canvas, then do the above.
-      </li>
-      <li>Share the blob
-      </li>
-    </ul>
     <section>
       <h2>
         API definition
@@ -177,7 +158,7 @@
             "!promises-guide#a-new-promise">a new promise</a>.
             </li>
             <li>If none of <var>data</var>'s members <a>title</a>, <a>text</a>,
-            or <a>url</a> are present, reject <var>p</var> with
+            <a>url</a>, or <a>image</a> are present, reject <var>p</var> with
             <a>TypeError</a>, and abort these steps.
             </li>
             <li>Set <var>data</var> to a copy of <var>data</var>.
@@ -202,6 +183,29 @@
                 <li>Set <var>data</var>'s <a>url</a> member to the result of
                 running the <a data-cite="!URL#concept-url-serializer">URL
                 serializer</a> on <var>url</var>.
+                </li>
+              </ol>
+            </li>
+            <li>If <var>data</var>'s <a for="ShareData">image</a> member is
+            <a data-cite="!WEBIDL#dfn-present">present</a>:
+              <ol>
+                <li>If <var>data</var>'s <a for="ShareData">image</a> is a <a>
+                  ShareImageData</a>, let <var>image</var> be <var>data</var>'s
+                  <a for="ShareImageData" data-lt=
+                  "source"><code>image.source</code></a> and <var>type</var> be
+                  <var>data</var>'s <a for="ShareImageData" data-lt=
+                  "type"><code>image.type</code></a> (or, if it is not
+                  <a data-cite="!WEBIDL#dfn-present">present</a>,
+                  <b>undefined</b>). Otherwise, let <var>image</var> be
+                  <var>data</var>'s <a for="ShareData">image</a> and
+                  <var>type</var> be <b>undefined</b>.
+                </li>
+                <li>Set <var>data</var>'s <a for="ShareData">image</a> field to
+                the result of <a>converting <var>image</var> to a
+                <code>Blob</code> with <var>type</var></a>. If this throws an
+                exception, <a data-cite=
+                "!promises-guide#reject-promise">reject</a> <var>p</var> with
+                the exception, and abort these steps.
                 </li>
               </ol>
             </li>
@@ -360,13 +364,15 @@
           can be passed here is:
           <ul>
             <li>
-              <a data-cite="!HTML#htmlimageelement">HTMLImageElement</a>, an
+              <a data-cite=
+              "!HTML#htmlimageelement"><code>HTMLImageElement</code></a>, an
               <a data-cite="!HTML#the-img-element"><code>&lt;img&gt;</code></a>
               element object. This won't work if the image source is on a
               different origin with cross-origin restrictions.
             </li>
             <li>
-              <a data-cite="!HTML#htmlvideoelement">HTMLVideoElement</a>, a
+              <a data-cite=
+              "!HTML#htmlvideoelement"><code>HTMLVideoElement</code></a>, a
               <a data-cite=
               "!HTML#the-video-element"><code>&lt;video&gt;</code></a> element
               object. This shares the current frame of the video, <em>not</em>
@@ -374,15 +380,16 @@
               different origin with cross-origin restrictions.
             </li>
             <li>
-              <a data-cite="!HTML#htmlcanvaselement">HTMLCanvasElement</a>, a
+              <a data-cite=
+              "!HTML#htmlcanvaselement"><code>HTMLCanvasElement</code></a>, a
               <a data-cite=
               "!HTML#the-canvas-element"><code>&lt;canvas&gt;</code></a>
               element object. This won't work if the canvas is not
               <a data-cite="!HTML#concept-canvas-origin-clean">origin-clean</a>.
             </li>
             <li>
-              <a data-cite="!HTML#imagedata">ImageData</a>, containing raw
-              pixel data.
+              <a data-cite="!HTML#imagedata"><code>ImageData</code></a>,
+              containing raw pixel data.
             </li>
             <li>
               <a data-cite="!FileAPI#dfn-Blob"><code>Blob</code></a>,
@@ -399,6 +406,85 @@
       </section>
     </section>
     <section data-link-for="Navigator">
+      <h2>
+        Sharing images
+      </h2>
+      <p>
+        To <dfn data-lt="converting image to a Blob with type">convert an
+        <var>image</var> to a <a data-cite=
+        "!FileAPI#dfn-Blob"><code>Blob</code></a> with <var>type</var></dfn>
+        (where <var>image</var> is an <a data-cite=
+        "!HTML#imagebitmapsource"><code>ImageBitmapSource</code></a> and
+        <var>type</var> is an optional string containing a <a data-cite=
+        "!rfc2046">MIME type</a>), the user agent should behave <em>as if</em>
+        the following algorithm were applied (it MAY perform a different set of
+        actions, for example not actually creating an <a data-cite=
+        "!HTML#htmlcanvaselement"><code>HTMLCanvasElement</code></a>, as long
+        as the results are the same):
+      </p>
+      <ol>
+        <li>If <var>image</var> is a <a data-cite=
+        "!FileAPI#dfn-blob"><code>Blob</code></a>:
+          <ol>
+            <li>If <var>type</var> is not <b>undefined</b>, throw a
+            <a data-cite=
+            "!WEBIDL#exceptiondef-typeerror"><code>TypeError</code></a>.
+            </li>
+            <li>OPTIONAL: Return <var>image</var>.
+            </li>
+            <li>Set <var>type</var> to <var>image</var>'s <a data-cite=
+            "!FileAPI#dfn-type"><code>type</code></a> attribute.
+            </li>
+          </ol>
+        </li>
+        <li>If <var>image</var> is an <a data-cite=
+        "!HTML#htmlcanvaselement"><code>HTMLCanvasElement</code></a>, let <var>
+          canvas</var> be <var>image</var>. Otherwise:
+          <ol>
+            <li>Let <var>canvas</var> be a new <a data-cite=
+            "!HTML#htmlcanvaselement"><code>HTMLCanvasElement</code></a> with a
+            <a data-cite=
+            "!HTML#canvasrenderingcontext2d"><code>CanvasRenderingContext2D</code></a>
+            called <var>context</var>.
+            </li>
+            <li>Call <var>context</var>'s <a data-cite=
+            "!HTML#dom-context-2d-drawimage"><code>drawImage</code></a> with
+            <var>image</var>, 0 and 0.
+            </li>
+          </ol>
+        </li>
+        <li>Return the result of calling <var>canvas</var>'s <a data-cite=
+        "!HTML#dom-canvas-toblob"><code>toBlob</code></a> with <var>type</var>.
+        </li>
+      </ol>
+      <div class="note">
+        The optional step in the above algorithm allows the user agent to
+        decide whether to re-encode the blob's image as a new blob, or simply
+        transmit the blob byte-for-byte as received. There are security
+        considerations associated with this decision.
+      </div>
+      <div class="note">
+        The algorithms used above require that the image source be
+        <a data-cite="!HTML#concept-canvas-origin-clean">origin-clean</a>. If
+        the image source is from a different origin that this site does not
+        have permission to read, this will result in a <a data-cite=
+        "!WEBIDL#securityerror"><code>SecurityError</code></a>.
+      </div>
+      <div class="issue">
+        In the above algorithm creating a <code>HTMLCanvasElement</code>
+        requires knowing the image size.
+      </div>
+      <div class="issue">
+        Converting <code>HTMLCanvasElement</code> to a <code>Blob</code> is
+        asynchronous (requires queueing a task, callbacks, etc). Sort this out.
+      </div>
+      <div class="issue">
+        You should be able to specify a <code>"quality"</code> attribute in
+        <a>ShareImageData</a> to control the serialization of the image to a
+        file, as you can with <code>HTMLCanvasElement.toBlob()</code>.
+      </div>
+    </section>
+    <section>
       <h2>
         Share targets
       </h2>
@@ -544,6 +630,13 @@
         in native applications that receive shares. There is no general way to
         guard against this, but implementors will want to be aware that it is a
         possibility.
+        </li>
+        <li>Of particular concern for remote code execution in share targets is
+        image data. This spec gives user agents the choice of whether to
+        transmit image files byte-for-byte as received from the site, or
+        re-encode the image into a new file. The latter is slower and
+        potentially lossy, but provides better security guarantees as
+        third-party applications are not trusted to parse arbitrary image data.
         </li>
       </ul>
     </section>
