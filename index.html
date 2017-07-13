@@ -98,6 +98,12 @@
             [SecureContext] Promise&lt;void&gt; share(optional ShareData data);
           };
         </pre>
+        <div class="issue">
+          Need a mechanism for feature-detecting image-sharing support. There
+          is <a href="https://github.com/heycam/webidl/issues/107">an open
+          discussion</a> about how to provide feature-detection for dictionary
+          members.
+        </div>
         <div class="note">
           The <var>data</var> argument is marked as "optional", but it is
           effectively required; <a>share()</a> will return a rejected promise
@@ -443,11 +449,6 @@
         older implementations that don't recognize those members. These new
         members might also be added as optional "MAY" requirements.
       </p>
-      <div class="note">
-        There is <a href="https://github.com/heycam/webidl/issues/107">an open
-        discussion</a> about how to provide feature-detection for dictionary
-        members. Web Share will use the mechanism produced by that discussion.
-      </div>
       <p data-link-for="Navigator">
         The <a>share()</a> method returns a rejected promise with a
         <a>TypeError</a> if none of the specified members are present. The
