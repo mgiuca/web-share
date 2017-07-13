@@ -427,9 +427,8 @@
       <p>
         The Web Share API is designed to be extended in the future by way of
         new members added to the <a>ShareData</a> dictionary, to allow both
-        sharing of new types of data (<i>e.g.</i>, <a href=
-        "https://github.com/WICG/web-share/issues/12">images</a>) and strings
-        with new semantics (<i>e.g.</i> author).
+        sharing of new types of data and strings with new semantics
+        (<i>e.g.</i> author).
       </p>
       <div class="warning">
         This doesn't mean user agents can add whatever members they like. It
@@ -456,7 +455,7 @@
         this list of recognized members. This is for future-proofing
         implementations: if a web site written against a future version of this
         spec uses <em>only</em> new members (<i>e.g.</i>,
-        <code>navigator.share({image: x})</code>), it will be valid in future
+        <code>navigator.share({author: x})</code>), it will be valid in future
         user agents, but a <a>TypeError</a> on user agents implementing an
         older version of the spec. Developers will be asked to feature-detect
         any new members they rely on, to avoid having errors surface in their
