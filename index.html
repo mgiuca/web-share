@@ -80,6 +80,27 @@
         would display a picker or chooser dialog, allowing the user to select a
         target to share this title and the page URL to.
       </p>
+      <p>
+        Sharing images is also supported, for example, from a <a data-cite=
+        "!HTML#the-canvas-element"><code>&lt;canvas&gt;</code></a> element.
+      </p>
+      <pre class="example javascript" title="Sharing an image from a canvas">
+        shareCanvasButton.addEventListener('click', () =&gt; {
+          const canvas = document.querySelector('#imageCanvas');
+          navigator.share({image: canvas})
+              .then(console.log('Share image successful'));
+        });
+      </pre>
+      <p>
+        You can also share an <a data-cite=
+        "!HTML#the-img-element"><code>&lt;img&gt;</code></a> or <a data-cite=
+        "!HTML#the-video-element"><code>&lt;video&gt;</code></a> element (in
+        the latter case, it shares an image of the current video frame), an
+        <a data-cite="!HTML#imagedata"><code>ImageData</code></a> object
+        containing raw pixel data, or a <a data-cite=
+        "!FileAPI#dfn-Blob"><code>Blob</code></a> containing an encoded image
+        file.
+      </p>
     </section>
     <section>
       <h2>
