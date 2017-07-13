@@ -102,6 +102,25 @@
         file.
       </p>
     </section>
+    <h2>
+      Rough notes on image sharing
+    </h2>
+    <ul>
+      <li>Define our own dict format with an optional mimeType member. Can
+      either specify this dict, or just a raw image.
+      </li>
+      <li>If it's a blob: if mimeType is explicitly specified, check that it
+      matches blob.type.
+      </li>
+      <li>If it's a HTMLCanvasElement: call toBlob() with the given mimeType,
+      or 'image/png' by default.
+      </li>
+      <li>If it's a different type of ImageBitmapSource: create a canvas, copy
+      it into the canvas, then do the above.
+      </li>
+      <li>Share the blob
+      </li>
+    </ul>
     <section>
       <h2>
         API definition
