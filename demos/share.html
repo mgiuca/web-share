@@ -27,7 +27,8 @@
     </tr>
   </table>
   <p><input id="share" type="button" value="Share" />
-     <input id="share-no-gesture" type="button" value="Share without user gesture" /></p>
+     <input id="share-no-gesture" type="button" value="Share without user gesture" />
+     <input id="share-with-fetch" type="button" value="Share with fetch" /></p>
   <div id="output"></div>
   <p>This is a test page for the <a href="https://github.com/WICG/web-share">Web
   Share API</a>. It will only work in browsers that have implemented the draft
@@ -48,6 +49,13 @@
       return new Promise(resolve => {
         setTimeout(resolve, delay);
       });
+    }
+
+    async function fetchBody(url) {
+      const response = await fetch(url);
+      //return response.url;
+      const body = await response.body.getReader().read();
+      return new TextDecoder('utf-8').decode(body.value);
     }
 
     function logText(message, isError) {
@@ -104,6 +112,11 @@
       testWebShare();
     }
 
+    async function testWebShareWithFetch() {
+      const body = await fetchBody('');
+      testWebShare();
+    }
+
     function onLoad() {
       // Checkboxes disable and delete textfields.
       document.querySelector('#title_checkbox').addEventListener('click',
@@ -116,6 +129,8 @@
       document.querySelector('#share').addEventListener('click', testWebShare);
       document.querySelector('#share-no-gesture').addEventListener('click',
           testWebShareDelay);
+      document.querySelector('#share-with-fetch').addEventListener('click',
+          testWebShareWithFetch);
 
       if (navigator.share === undefined) {
         logError('Error: You need to use a browser that supports this draft ' +
